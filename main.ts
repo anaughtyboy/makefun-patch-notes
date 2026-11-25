@@ -23,6 +23,13 @@ if (LINE.trim().length === 0) {
 if (LINE !== LINE.trim()) {
   fail("line must not have leading or trailing whitespace");
 }
+// Control characters (other than the newlines already rejected) would
+// not survive the gate's UTF-8 text check, so refuse them up front.
+for (const ch of LINE) {
+  if (ch.charCodeAt(0) < 32) {
+    fail(`line contains a control character (U+${ch.charCodeAt(0).toString(16).padStart(4, "0")})`);
+  }
+}
 
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outputDir, { recursive: true });
